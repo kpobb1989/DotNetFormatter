@@ -1,5 +1,3 @@
 backend/.idea
-*.dll
-*.exe
 bin/
 obj/
