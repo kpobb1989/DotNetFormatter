@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.Text;
 
-namespace LeetCodeDotNetFormatterApi.Controllers;
+namespace DotNetFormatter.Controllers;
 
 [ApiController]
 [Route("[controller]")]
