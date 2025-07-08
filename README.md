@@ -4,7 +4,7 @@ DotNetFormatter is a handy tool that automatically formats C# code on LeetCode a
 
 # How to install
 1. Install [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) extension for Google Chrome
-2. Install [LeetCode user script](https://github.com/kpobb1989/LeetCodeDotNetFormatter/raw/refs/heads/main/Solution/DotNetFormatter.user.js)
+2. Install [user script](https://github.com/kpobb1989/LeetCodeDotNetFormatter/raw/refs/heads/main/Solution/DotNetFormatter.user.js)
 3. Install [.Net Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) (If it isn't installed already)
 4. Download [DotNetFormatter.exe](https://github.com/kpobb1989/LeetCodeDotNetFormatter/raw/refs/heads/main/Solution/DotNetFormatter.exe) (make sure port 5000 is available)
 
