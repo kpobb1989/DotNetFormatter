@@ -1,4 +1,3 @@
-backend/.idea
-bin/
-obj/
-/DotNetFormatter/.idea/.idea.DotNetFormatter/.idea/vcs.xml
+.idea
+bin
+obj
