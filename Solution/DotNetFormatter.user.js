@@ -19,7 +19,7 @@
             method: 'POST',
             mode: 'cors',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(codeToFormat), // Potential issue 1
+            body: JSON.stringify(codeToFormat),
         }).then(response => {
             if (!response.ok) {
                 return response.text().then(errorText => {
