@@ -5,6 +5,7 @@
 // @description Format C# code for LeetCode and AlgoExpert using a local API and enables Alt+Shift+F shortcut
 // @author Oleksandr Kushnir
 // @match https://leetcode.com/problems/*
+// @match https://leetcode.com/explore/interview/card/*
 // @match https://www.algoexpert.io/questions/*
 // @grant none
 // ==/UserScript==
@@ -13,6 +14,23 @@
     'use strict';
 
     const API_URL = 'http://127.0.0.1:5000/format';
+
+    // Enable user select only for AlgoExpert
+    if (window.location.hostname === 'www.algoexpert.io') {
+        const observer = new MutationObserver(() => {
+            document.querySelectorAll('div').forEach(el => {
+                el.style.userSelect = 'auto';
+                el.style.webkitUserSelect = 'auto';
+                el.style.mozUserSelect = 'auto';
+                el.style.msUserSelect = 'auto';
+            });
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
 
     function formatCode(codeToFormat) {
         fetch(API_URL, {
@@ -28,25 +46,40 @@
             }
             return response.text();
         }).then(formattedCode => {
-            const monaco = getMonacoEditor();
-
-            if (monaco && monaco.executeEdits && monaco.getModel) {
-                const model = monaco.getModel();
-                if (model) {
-                    monaco.executeEdits('format-code', [{
-                        range: model.getFullModelRange(),
-                        text: formattedCode
-                    }]);
-
-                    showNotification('Code formatted successfully');
-                } else {
-                    showNotification("Error: Editor not fully ready.", "error");
-                }
-            } else {
+            if(window.location.hostname === 'www.algoexpert.io'){
                 document.execCommand('selectAll');
                 document.execCommand('insertText', false, formattedCode.replace(/\r\n/g, '\n'));
 
                 showNotification('Code formatted successfully');
+            }
+            else{
+                const monaco = getMonacoEditor();
+
+                if (monaco && monaco.executeEdits && monaco.getModel) {
+                    const model = monaco.getModel();
+                    if (model) {
+                        monaco.executeEdits('format-code', [{
+                            range: model.getFullModelRange(),
+                            text: formattedCode
+                        }]);
+
+                        showNotification('Code formatted successfully');
+                    } else {
+                        showNotification("Error: Editor not fully ready.", "error");
+                    }
+
+                    return;
+                }
+
+                const codeMirror = getCodeMirror();
+
+                if (codeMirror){
+                    codeMirror.setValue(formattedCode);
+
+                    showNotification('Code formatted successfully');
+
+                    return;
+                }
             }
         }).catch(error => {
             console.error('Error in formatCode:', error);
@@ -94,17 +127,36 @@
                 return editors[0];
             }
         }
+
         return null;
     }
 
+    function getCodeMirror() {
+        return document.querySelector(".CodeMirror")?.CodeMirror;
+    }
+
     document.addEventListener('keydown', async (event) => {
-        if (event.altKey && event.shiftKey && (event.key === 'f' || event.key === 'F')) {
+        if (event.altKey && event.shiftKey && event.code === 'KeyF') {
             event.preventDefault();
 
             const lines = Array.from(document.activeElement.querySelectorAll('.cm-line'));
-            const codeToFormat = lines.map(line => line.textContent).join('\r\n');
 
-            formatCode(codeToFormat);
+            if(lines && lines.length > 0){
+                const codeToFormat = lines.map(line => line.textContent).join('\r\n');
+
+                formatCode(codeToFormat);
+
+                return;
+            }
+
+            const codeMirror = getCodeMirror();
+            const codeToFormat = codeMirror?.getValue();
+
+            if(codeToFormat && codeToFormat.length > 0){
+                formatCode(codeToFormat);
+
+                return;
+            }
         }
     });
 
