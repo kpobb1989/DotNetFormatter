@@ -136,29 +136,32 @@
     }
 
     document.addEventListener('keydown', async (event) => {
-        if (event.altKey && event.shiftKey && event.code === 'KeyF') {
-            event.preventDefault();
+        const isMac = /Mac/i.test(navigator.platform || navigator.userAgent);
+        const isFormatShortcut =
+              event.code === 'KeyF' &&
+              event.shiftKey &&
+              ((isMac && event.metaKey) || (!isMac && event.altKey));
 
-            const lines = Array.from(document.activeElement.querySelectorAll('.cm-line'));
+        if (!isFormatShortcut) return;
 
-            if(lines && lines.length > 0){
-                const codeToFormat = lines.map(line => line.textContent).join('\r\n');
+        event.preventDefault();
 
-                formatCode(codeToFormat);
+        // Try Monaco first (active model), then fallback to CodeMirror (your helper)
+        const monacoText = window.monaco?.editor?.getModels?.()[0]?.getValue?.();
+        let codeToFormat = monacoText;
 
-                return;
-            }
+        if (!codeToFormat || codeToFormat.length === 0) {
+            const codeMirror = typeof getCodeMirror === 'function' ? getCodeMirror() : null;
+            codeToFormat = codeMirror?.getValue?.();
+        }
 
-            const codeMirror = getCodeMirror();
-            const codeToFormat = codeMirror?.getValue();
-
-            if(codeToFormat && codeToFormat.length > 0){
-                formatCode(codeToFormat);
-
-                return;
-            }
+        if (codeToFormat && codeToFormat.length > 0) {
+            await formatCode(codeToFormat);
+        } else {
+            console.warn('No code found in Monaco or CodeMirror.');
         }
     });
+
 
     const observer = new MutationObserver((mutationsList, obs) => {
         const monaco = getMonacoEditor();
